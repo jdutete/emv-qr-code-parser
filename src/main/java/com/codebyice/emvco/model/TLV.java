@@ -22,4 +22,13 @@ class TLV {
     public String getValue() {
         return this.value;
     }
+
+    @Override
+    public String toString() {
+        return "TLV{" +
+                "tag='" + tag + '\'' +
+                ", length=" + length +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

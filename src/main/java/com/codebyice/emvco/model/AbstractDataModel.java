@@ -5,6 +5,8 @@ import com.codebyice.emvco.InvalidValueException;
 import com.codebyice.emvco.MissingTagException;
 import com.codebyice.emvco.ValidationUtils;
 import com.codebyice.emvco.tags.ITag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.*;
@@ -14,6 +16,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AbstractDataModel<T extends ITag> implements Serializable {
+
+    private static Logger logger = LoggerFactory.getLogger(AbstractDataModel.class);
+
     private Pattern pattern;
     private ITag[] allTags;
     private String parent;
@@ -95,6 +100,7 @@ public abstract class AbstractDataModel<T extends ITag> implements Serializable 
     }
 
     public String prettyPrint(){
+        logger.info("Preparing to print prettily...");
         ArrayList<String> keys = new ArrayList(map.keySet());
         keys.sort(Comparator.comparingInt(Integer::parseInt));
         StringBuffer sb =new StringBuffer();
@@ -120,6 +126,7 @@ public abstract class AbstractDataModel<T extends ITag> implements Serializable 
     }
 
     public String print(){
+        logger.info("Generating QR code string...");
         return this.map.keySet().stream()
                 .map(t -> {
                     String value = getStringValue(t);
@@ -129,23 +136,10 @@ public abstract class AbstractDataModel<T extends ITag> implements Serializable 
                         return null;
                     }
                 }).collect(Collectors.joining());
-
-//        ArrayList<String> keys = new ArrayList(map.keySet());
-//        StringBuffer sb =new StringBuffer();
-//        for (String key: keys) {
-//            ITag tag = getTag(key);
-//            Serializable serializable = map.get(key);
-//            String value = String.valueOf(serializable);
-//            if(value != null && value.length() > 0){
-//                sb.append(key)
-//                        .append(String.format("%02d", value.length()))
-//                    .append(value);
-//            }
-//        }
-//        return sb.toString();
     }
 
     public void validate() {
+        logger.info("Validating tag data...");
         Stream.of(allTags)
                 .forEach(this::validateTag);
     }
