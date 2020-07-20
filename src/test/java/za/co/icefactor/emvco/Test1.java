@@ -42,18 +42,18 @@ public class Test1 {
 
     }
 
-    @Test
-    public void t(){
-
-        String qrString = "0005UMPQR0102115204343053037105802ZA5907DIGITAL6012JOHANNESBURG62800127STATIC_200431200720070110350520200431200720070110350706200431150121606000318";
-        System.out.println("QR: " + qrString);
-
-        QrDetail qr = Parser.parse(qrString);
-//        System.out.println(qr);
-        String s = qr.prettyPrint();
-        System.out.println(s);
-
-    }
+//    @Test
+//    public void t(){
+//
+//        String qrString = "0005UMPQR0102115204343053037105802ZA5907DIGITAL6012JOHANNESBURG62800127STATIC_200431200720070110350520200431200720070110350706200431150121606000318";
+//        System.out.println("QR: " + qrString);
+//
+//        QrDetail qr = Parser.parse(qrString);
+////        System.out.println(qr);
+//        String s = qr.prettyPrint();
+//        System.out.println(s);
+//
+//    }
 
 
 }
