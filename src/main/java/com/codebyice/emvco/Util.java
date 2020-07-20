@@ -1,4 +1,4 @@
-package za.co.icefactor.emvco;
+package com.codebyice.emvco;
 
 import java.io.UnsupportedEncodingException;
 

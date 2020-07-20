@@ -1,30 +1,31 @@
-package za.co.icefactor.emvco.model;
+package com.codebyice.emvco.model;
 
-import za.co.icefactor.emvco.InvalidTagValueException;
-import za.co.icefactor.emvco.InvalidValueException;
-import za.co.icefactor.emvco.MissingTagException;
-import za.co.icefactor.emvco.ValidationUtils;
-import za.co.icefactor.emvco.tags.ITag;
+import com.codebyice.emvco.InvalidTagValueException;
+import com.codebyice.emvco.InvalidValueException;
+import com.codebyice.emvco.MissingTagException;
+import com.codebyice.emvco.ValidationUtils;
+import com.codebyice.emvco.tags.ITag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AbstractDataModel<T extends ITag> implements Serializable {
+
+    private static Logger logger = LoggerFactory.getLogger(AbstractDataModel.class);
+
     private Pattern pattern;
     private ITag[] allTags;
     private String parent;
-    protected HashMap<String, Serializable> map;
+    protected Map<String, Serializable> map = new TreeMap<>();
 
 
     AbstractDataModel(Class<T> typeParameterClass, String regex) {
-        this.pattern = null;
-        this.parent = null;
-        this.map = new HashMap<>();
         this.allTags = typeParameterClass.getEnumConstants();
         if (!regex.isEmpty()) {
             this.pattern = Pattern.compile(regex);
@@ -38,43 +39,29 @@ public abstract class AbstractDataModel<T extends ITag> implements Serializable 
 
     abstract ITag getTag(String key);
 
-    private boolean checkValueAgainstTagString(String tagString) {
-        ValidationUtils.notNull(tagString);
-        return this.map.containsKey(tagString);
+    public boolean isSet(ITag tag){
+        return isSet(tag.getTag());
     }
 
-    public boolean hasValue(String tagString)  {
-        ValidationUtils.validateTagString(tagString);
-        return this.checkValueAgainstTagString(tagString);
+    private boolean isSet(String tag) {
+        return this.map.containsKey(tag);
     }
 
-    public boolean hasValue(T tag) {
-        return this.checkValueAgainstTagString(tag.getTag());
-    }
-
-    private Serializable getValueFromTagString(String tagString) {
-        ValidationUtils.notNull(tagString);
-        Serializable value = this.map.get(tagString);
-        return value;
-    }
-
-    public Serializable getValue(String tagString) {
-        ValidationUtils.validateTagString(tagString);
-        return this.getValueFromTagString(tagString);
+    private Serializable getTagValue(String tag) {
+        return this.map.get(tag);
     }
 
     public Serializable getValue(T tag) {
-        return this.getValueFromTagString(tag.getTag());
+        return this.getTagValue(tag.getTag());
     }
 
-    public String getStringValue(String tagString)  {
-        Serializable value = this.getValue(tagString);
+    public String getStringValue(String tag)  {
+        Serializable value = getTagValue(tag);
         return value == null ? null : value.toString();
     }
 
     public String getStringValue(T tag) {
-        Serializable value = this.getValue(tag);
-        return value == null ? null : value.toString();
+        return getStringValue(tag.getTag());
     }
 
     private AbstractDataModel setValueWithTagString(String tagString, Serializable value) {
@@ -96,20 +83,12 @@ public abstract class AbstractDataModel<T extends ITag> implements Serializable 
         return this;
     }
 
-    protected AbstractDataModel setValueInTagRange(Serializable value, int low, int high) {
-        for(int i = low; i < high + 1; ++i) {
-            String currentTag = String.valueOf(i);
-            if (!this.hasValue(currentTag)) {
-                this.setValueWithTagString(currentTag, value);
-                break;
-            }
-        }
-        return this;
+    protected void removeTag(T tag) {
+        removeTag(tag.getTag());
     }
 
-    protected void removeValue(T tag) {
-        ValidationUtils.notNull(tag);
-        this.map.remove(tag.getTag());
+    protected void removeTag(String tag) {
+        this.map.remove(tag);
     }
 
     protected String getParent() {
@@ -121,6 +100,7 @@ public abstract class AbstractDataModel<T extends ITag> implements Serializable 
     }
 
     public String prettyPrint(){
+        logger.info("Preparing to print prettily...");
         ArrayList<String> keys = new ArrayList(map.keySet());
         keys.sort(Comparator.comparingInt(Integer::parseInt));
         StringBuffer sb =new StringBuffer();
@@ -146,30 +126,27 @@ public abstract class AbstractDataModel<T extends ITag> implements Serializable 
     }
 
     public String print(){
-        ArrayList<String> keys = new ArrayList(map.keySet());
-        keys.sort(Comparator.comparingInt(Integer::parseInt));
-        StringBuffer sb =new StringBuffer();
-        for (String key: keys) {
-            ITag tag = getTag(key);
-            Serializable serializable = map.get(key);
-            String value = String.valueOf(serializable);
-            if(value != null && value.length() > 0){
-                sb.append(key)
-                        .append(String.format("%02d", value.length()))
-                    .append(value);
-            }
-        }
-        return sb.toString();
+        logger.info("Generating QR code string...");
+        return this.map.keySet().stream()
+                .map(t -> {
+                    String value = getStringValue(t);
+                    if(value != null && value.length() > 0){
+                        return t + String.format("%02d", value.length()) + value;
+                    } else {
+                        return null;
+                    }
+                }).collect(Collectors.joining());
     }
 
     public void validate() {
+        logger.info("Validating tag data...");
         Stream.of(allTags)
                 .forEach(this::validateTag);
     }
 
     private void validateTag(ITag tag) {
         int tagNumber = Integer.parseInt(tag.getTag());
-        Serializable serializable = this.map.get(tag.getTag());
+        Serializable serializable = getTagValue(tag.getTag());
         if (serializable == null && tag.isMandatory()) {
             throw new MissingTagException(tag);
         }

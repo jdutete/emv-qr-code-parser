@@ -1,4 +1,4 @@
-package za.co.icefactor.emvco.model;
+package com.codebyice.emvco.model;
 
 class TLV {
     private String tag;
@@ -21,5 +21,14 @@ class TLV {
 
     public String getValue() {
         return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return "TLV{" +
+                "tag='" + tag + '\'' +
+                ", length=" + length +
+                ", value='" + value + '\'' +
+                '}';
     }
 }

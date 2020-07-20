@@ -1,11 +1,11 @@
-package za.co.icefactor.emvco.model;
+package com.codebyice.emvco.model;
 
 import java.util.Arrays;
 import java.util.Optional;
 
 public enum Poi implements DocumentingEnum {
-    _11 ("11", "Static"),
-    _12 ("12", "Dynamic");
+    STATIC("11", "Static"),
+    DYNAMIC("12", "Dynamic");
 
     private final String value;
     private final String description;

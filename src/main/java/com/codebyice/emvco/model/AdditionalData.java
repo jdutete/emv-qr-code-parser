@@ -1,9 +1,9 @@
-package za.co.icefactor.emvco.model;
+package com.codebyice.emvco.model;
 
-import za.co.icefactor.emvco.UnknownTagException;
-import za.co.icefactor.emvco.tags.AdditionalDataTag;
-import za.co.icefactor.emvco.tags.ITag;
-import za.co.icefactor.emvco.tags.Tag;
+import com.codebyice.emvco.UnknownTagException;
+import com.codebyice.emvco.tags.ITag;
+import com.codebyice.emvco.tags.Tag;
+import com.codebyice.emvco.tags.AdditionalDataTag;
 
 import java.io.Serializable;
 

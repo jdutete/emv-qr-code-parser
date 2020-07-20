@@ -1,6 +1,6 @@
-package za.co.icefactor.emvco.tags;
+package com.codebyice.emvco.tags;
 
-import za.co.icefactor.emvco.UnknownTagException;
+import com.codebyice.emvco.UnknownTagException;
 
 import java.util.function.Function;
 import java.util.regex.Pattern;
