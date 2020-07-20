@@ -1,10 +1,13 @@
-package za.co.icefactor.emvco.model;
+package com.codebyice.emvco.model;
 
-import za.co.icefactor.emvco.Util;
-import za.co.icefactor.emvco.tags.ITag;
-import za.co.icefactor.emvco.tags.Tag;
+import com.codebyice.emvco.Util;
+import com.codebyice.emvco.tags.ITag;
+import com.codebyice.emvco.tags.Tag;
 
 import java.io.Serializable;
+
+import static com.codebyice.emvco.model.Poi.DYNAMIC;
+import static com.codebyice.emvco.model.Poi.STATIC;
 
 public final class QrDetail extends AbstractDataModel<Tag> {
 
@@ -29,11 +32,10 @@ public final class QrDetail extends AbstractDataModel<Tag> {
     public String toQrString() {
         this.populatePoi();
         this.validate();
-        if (this.hasValue(Tag._62_ADDITIONAL_DATA_FIELD)) {
+        if (this.isSet(Tag._62_ADDITIONAL_DATA_FIELD)) {
 //            this.getAdditionalData().validateDataForGeneration();
         }
-
-        this.removeValue(Tag._63_CRC);
+        this.removeTag(Tag._63_CRC); //we dont print out the CRC
         String content = this.toString() + "6304";
         String checksum = Util.generateChecksumCRC16(content);
         this.setValue(Tag._63_CRC, checksum);
@@ -50,17 +52,17 @@ public final class QrDetail extends AbstractDataModel<Tag> {
         return this;
     }
 
+    public QrDetail setPointOfInitiationMethod(Poi poi){
+        setValue(Tag._01_POINT_INITIATION_METHOD, poi.getValue());
+        return this;
+    }
     public String getPointOfInitiationMethod() {
         return this.getStringValue(Tag._01_POINT_INITIATION_METHOD);
     }
 
     private QrDetail populatePoi() {
-        if (this.hasValue(Tag._54_TRANSACTION_AMOUNT)) {
-            this.setValue(Tag._01_POINT_INITIATION_METHOD, "12");
-        } else {
-            this.setValue(Tag._01_POINT_INITIATION_METHOD, "11");
-        }
-
+        Poi poi = isSet(Tag._54_TRANSACTION_AMOUNT) ? DYNAMIC : STATIC;
+        setPointOfInitiationMethod(poi);
         return this;
     }
 
@@ -177,6 +179,7 @@ public final class QrDetail extends AbstractDataModel<Tag> {
         return this.getStringValue(Tag._63_CRC);
     }
 
+    //TODO use enum
     private boolean isDynamic() {
         String poi = this.getPointOfInitiationMethod();
         return poi != null && poi.endsWith("2");

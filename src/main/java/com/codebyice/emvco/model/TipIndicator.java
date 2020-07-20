@@ -1,4 +1,4 @@
-package za.co.icefactor.emvco.model;
+package com.codebyice.emvco.model;
 
 import java.util.Arrays;
 import java.util.Optional;

@@ -1,9 +1,9 @@
-package za.co.icefactor.emvco.model;
+package com.codebyice.emvco.model;
 
-import za.co.icefactor.emvco.InvalidTagValueException;
-import za.co.icefactor.emvco.Util;
-import za.co.icefactor.emvco.ValidationUtils;
-import za.co.icefactor.emvco.tags.Tag;
+import com.codebyice.emvco.InvalidTagValueException;
+import com.codebyice.emvco.Util;
+import com.codebyice.emvco.ValidationUtils;
+import com.codebyice.emvco.tags.Tag;
 
 import java.io.Serializable;
 
@@ -30,25 +30,36 @@ public class Parser {
         }
     }
 
-    public static QrDetail parseWithoutTagValidationAndCRC(String rawData)  {
-        ValidationUtils.notNull(rawData);
+    public static QrDetail parseWithoutTagValidationAndCRC(String qrString)  {
+        ValidationUtils.notNull(qrString);
         int index = 0;
 
-        QrDetail ppData;
-        TLV tlv;
-        for(ppData = new QrDetail(); index < rawData.length(); index = index + tlv.getValue().length() + 4) {
-            tlv = readNextTLV(rawData, index);
+        QrDetail qrDetail = new QrDetail();
+
+        while (index < qrString.length()) {
+            TLV tlv = readNextTLV(qrString, index);
             String tag = tlv.getTag();
-            int tagvalue = Integer.parseInt(tag);
-            if (tag.equals("62")) {
+            if (tag.equals(Tag._62_ADDITIONAL_DATA_FIELD.getTag())) {
                 AdditionalData additionalData = parseAdditionalData(tlv.getValue());
-                setParsedValue(ppData, tag, additionalData);
+                setParsedValue(qrDetail, tag, additionalData);
             }  else {
-                setParsedValue(ppData, tag, tlv.getValue());
+                setParsedValue(qrDetail, tag, tlv.getValue());
             }
+            index = index + tlv.getValue().length() + 4;
         }
 
-        return ppData;
+//        for(qrDetail = new QrDetail(); index < qrString.length(); index = index + tlv.getValue().length() + 4) {
+//            tlv = readNextTLV(qrString, index);
+//            String tag = tlv.getTag();
+//            int tagvalue = Integer.parseInt(tag);
+//            if (tag.equals(Tag._62_ADDITIONAL_DATA_FIELD.getTag())) {
+//                AdditionalData additionalData = parseAdditionalData(tlv.getValue());
+//                setParsedValue(qrDetail, tag, additionalData);
+//            }  else {
+//                setParsedValue(qrDetail, tag, tlv.getValue());
+//            }
+//        }
+        return qrDetail;
     }
 
     private static AdditionalData parseAdditionalData(String rawData)  {
@@ -93,12 +104,8 @@ public class Parser {
     }
 
     private static <A extends AbstractDataModel> A setParsedValue(A data, String tagString, Serializable value) {
-        if (data.hasValue(tagString)) {
-            throw new RuntimeException("tag already has data");
-        } else {
-            data.setValue(tagString, value);
-            return data;
-        }
+        data.setValue(tagString, value);
+        return data;
     }
 
     private Parser() {

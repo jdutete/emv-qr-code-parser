@@ -1,4 +1,4 @@
-package za.co.icefactor.emvco.model;
+package com.codebyice.emvco.model;
 
 class TLV {
     private String tag;

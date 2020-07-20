@@ -1,8 +1,8 @@
-package za.co.icefactor.emvco.tags;
+package com.codebyice.emvco.tags;
 
-import za.co.icefactor.emvco.UnknownTagException;
-import za.co.icefactor.emvco.model.Poi;
-import za.co.icefactor.emvco.model.TipIndicator;
+import com.codebyice.emvco.UnknownTagException;
+import com.codebyice.emvco.model.Poi;
+import com.codebyice.emvco.model.TipIndicator;
 
 import java.util.function.Function;
 import java.util.regex.Pattern;

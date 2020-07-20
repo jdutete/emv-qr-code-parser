@@ -1,6 +1,6 @@
-package za.co.icefactor.emvco;
+package com.codebyice.emvco;
 
-import za.co.icefactor.emvco.tags.ITag;
+import com.codebyice.emvco.tags.ITag;
 
 public class InvalidTagValueException extends RuntimeException {
     public InvalidTagValueException(ITag tag, String vString) {

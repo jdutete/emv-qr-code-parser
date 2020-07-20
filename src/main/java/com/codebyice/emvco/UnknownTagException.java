@@ -1,4 +1,4 @@
-package za.co.icefactor.emvco;
+package com.codebyice.emvco;
 
 public class UnknownTagException extends RuntimeException {
     public UnknownTagException(String tagString) {
